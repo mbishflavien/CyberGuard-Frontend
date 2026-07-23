@@ -337,6 +337,9 @@ export function AfricanInitiative() {
     setVy(0);
   };
 
+  // Helper to fix cross-environment floating point hydration precision mismatch
+  const r3 = (n: number) => Number(n.toFixed(3));
+
   // Zero-Latency Multi-Axis Matrix Math values
   const transformMath = useMemo(() => {
     const rx = (rotationX * Math.PI) / 180;
@@ -361,9 +364,9 @@ export function AfricanInitiative() {
 
       return {
         id: pt.id,
-        x: 50 + R * xRotY,
-        y: 52 + R * yFinal,
-        z: zFinal,
+        x: r3(50 + R * xRotY),
+        y: r3(52 + R * yFinal),
+        z: r3(zFinal),
         isAfrica: pt.isAfrica,
       };
     });
@@ -380,9 +383,9 @@ export function AfricanInitiative() {
 
       return {
         ...node,
-        projX: 50 + R * xRotY,
-        projY: 52 + R * yFinal,
-        projZ: zFinal,
+        projX: r3(50 + R * xRotY),
+        projY: r3(52 + R * yFinal),
+        projZ: r3(zFinal),
       };
     });
   }, [transformMath]);
@@ -656,7 +659,7 @@ export function AfricanInitiative() {
                 <circle
                   cx="50"
                   cy="52"
-                  r={34 * zoom}
+                  r={r3(34 * zoom)}
                   fill="url(#sphere-gradient)"
                   stroke="url(#glow-edge)"
                   strokeWidth="0.8"
@@ -670,7 +673,7 @@ export function AfricanInitiative() {
                       key={dot.id}
                       cx={dot.x}
                       cy={dot.y}
-                      r={0.22 * zoom}
+                      r={r3(0.22 * zoom)}
                       fill="#38bdf8"
                     />
                   ))}
@@ -680,8 +683,8 @@ export function AfricanInitiative() {
                 <g>
                   {projectedLandDots.filter(d => d.z >= -8).map((dot) => {
                     const normalizedZ = (dot.z + 8) / 42;
-                    const dotOpacity = Math.max(0.08, normalizedZ * (dot.isAfrica ? 0.85 : 0.5));
-                    const dotRadius = Math.max(0.12, normalizedZ * (dot.isAfrica ? 0.38 : 0.28) * zoom);
+                    const dotOpacity = r3(Math.max(0.08, normalizedZ * (dot.isAfrica ? 0.85 : 0.5)));
+                    const dotRadius = r3(Math.max(0.12, normalizedZ * (dot.isAfrica ? 0.38 : 0.28) * zoom));
                     
                     return (
                       <circle
@@ -771,7 +774,7 @@ export function AfricanInitiative() {
                             <motion.circle
                               cx={node.projX}
                               cy={node.projY}
-                              r={1.2 * zoom}
+                              r={r3(1.2 * zoom)}
                               fill="none"
                               stroke={isHovered ? '#22d3ee' : 'rgba(56, 189, 248, 0.45)'}
                               strokeWidth="0.2"
@@ -791,7 +794,7 @@ export function AfricanInitiative() {
                         <circle
                           cx={node.projX}
                           cy={node.projY}
-                          r={(node.hub ? 2.6 : 1.8) * zoom}
+                          r={r3((node.hub ? 2.6 : 1.8) * zoom)}
                           fill="rgba(34, 211, 238, 0.15)"
                           stroke="rgba(34, 211, 238, 0.25)"
                           strokeWidth="0.18"
@@ -804,7 +807,7 @@ export function AfricanInitiative() {
                         <circle
                           cx={node.projX}
                           cy={node.projY}
-                          r={(node.hub ? 0.95 : 0.6) * zoom}
+                          r={r3((node.hub ? 0.95 : 0.6) * zoom)}
                           fill={isHovered ? '#22d3ee' : (node.hub ? '#38bdf8' : '#3b82f6')}
                           stroke="#ffffff"
                           strokeWidth="0.22"
@@ -813,9 +816,9 @@ export function AfricanInitiative() {
 
                         {/* Text label */}
                         <text
-                          x={node.projX + (node.projX > 50 ? -2.2 : 2.2)}
-                          y={node.projY + 0.4}
-                          fontSize={1.3 * Math.max(0.85, zoom * 0.9)}
+                          x={r3(node.projX + (node.projX > 50 ? -2.2 : 2.2))}
+                          y={r3(node.projY + 0.4)}
+                          fontSize={r3(1.3 * Math.max(0.85, zoom * 0.9))}
                           fontFamily="monospace"
                           fontWeight={node.hub ? 'bold' : 'normal'}
                           textAnchor={node.projX > 50 ? 'end' : 'start'}
@@ -841,7 +844,7 @@ export function AfricanInitiative() {
                 <circle
                   cx="50"
                   cy="52"
-                  r={34 * zoom}
+                  r={r3(34 * zoom)}
                   fill="none"
                   stroke="rgba(56, 189, 248, 0.08)"
                   strokeWidth="0.2"
