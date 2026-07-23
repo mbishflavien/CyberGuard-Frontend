@@ -43,11 +43,11 @@ export function Hero() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.02] mb-8 text-slate-900 dark:text-white"
+            className="font-display text-5xl sm:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.02] mb-8 text-slate-900 dark:text-white drop-shadow-md"
           >
             <span className="block">One Platform.</span>
             <span className="block">Zero Blind Spots.</span>
-            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-300 to-slate-100 font-extrabold">
+            <span className="block text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-800 dark:from-blue-400 dark:via-indigo-300 dark:to-slate-100 font-extrabold">
               Cybersecurity Built for Africa.
             </span>
           </motion.h1>
@@ -56,7 +56,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl mb-10"
+            className="text-lg sm:text-xl text-slate-700 dark:text-slate-200 leading-relaxed max-w-2xl mb-10 font-normal"
           >
             CyberGuard unifies AI Security Operations, EDR, NDR, SIEM, SOAR, Threat
             Intelligence, and Compliance into a single intelligent platform — replacing

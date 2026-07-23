@@ -287,8 +287,8 @@ export function ProductShowcase() {
                     : 'glass border-white/5 hover:bg-white/5'
                 }`}
               >
-                <product.icon className={`w-5 h-5 flex-shrink-0 ${active === i ? 'text-blue-400' : 'text-muted-foreground'}`} />
-                <span className={`text-sm font-medium whitespace-nowrap ${active === i ? '' : 'text-muted-foreground'}`}>
+                <product.icon className={`w-5 h-5 flex-shrink-0 ${active === i ? 'text-blue-600 dark:text-blue-400' : 'text-slate-500 dark:text-slate-400'}`} />
+                <span className={`text-sm font-medium whitespace-nowrap ${active === i ? 'text-slate-900 dark:text-white font-bold' : 'text-slate-700 dark:text-slate-300'}`}>
                   {product.name}
                 </span>
               </motion.button>
@@ -313,18 +313,18 @@ export function ProductShowcase() {
                   })()}
                 </div>
                 <div>
-                  <h3 className="font-display text-lg font-semibold">{products[active].name}</h3>
+                  <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">{products[active].name}</h3>
                 </div>
               </div>
-              <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+              <p className="text-sm text-slate-700 dark:text-slate-200 mb-6 leading-relaxed">
                 {products[active].description}
               </p>
-              <div className="rounded-xl bg-secondary/50 border border-white/5 p-4">
+              <div className="rounded-xl bg-slate-900/90 dark:bg-slate-900/80 border border-slate-700/50 dark:border-white/10 p-4">
                 <div className="flex items-center gap-1.5 mb-3">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-400/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400/60" />
-                  <div className="ml-2 text-xs text-muted-foreground font-mono">cyberguard.app/{products[active].preview}</div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-red-400/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
+                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
+                  <div className="ml-2 text-xs text-slate-300 font-mono">cyberguard.app/{products[active].preview}</div>
                 </div>
                 <PreviewPanel type={products[active].preview} />
               </div>

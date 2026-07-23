@@ -204,8 +204,8 @@ export function AttackTimeline() {
                       className="glass rounded-2xl p-6 hover:bg-white/5 transition-colors border-white/5 hover:border-blue-500/20 transform-style-3d origin-center"
                     >
                       <div className={`text-xs font-mono ${c.text} mb-1.5`}>{step.time}</div>
-                      <h3 className="font-display text-lg font-semibold mb-1">{step.title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{step.description}</p>
+                      <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white mb-1">{step.title}</h3>
+                      <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">{step.description}</p>
                     </motion.div>
                   </div>
 

@@ -50,7 +50,7 @@ export function Stats() {
                   prefix={stat.prefix}
                 />
               </div>
-              <div className="text-sm text-muted-foreground mt-2">{stat.label}</div>
+              <div className="text-sm text-slate-700 dark:text-slate-200 font-semibold mt-2">{stat.label}</div>
             </motion.div>
           ))}
         </motion.div>

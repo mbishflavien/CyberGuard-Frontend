@@ -33,7 +33,7 @@ export function SectionHeading({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-xs font-mono uppercase tracking-[0.2em] text-primary/80 px-3 py-1 rounded-full glass"
+          className="text-xs font-mono uppercase tracking-[0.2em] font-semibold text-blue-600 dark:text-blue-400 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 shadow-sm"
         >
           {eyebrow}
         </motion.span>
@@ -43,7 +43,7 @@ export function SectionHeading({
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.1]"
+        className="font-display text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight leading-[1.1] text-slate-900 dark:text-white drop-shadow-sm"
       >
         {title}
       </motion.h2>
@@ -53,7 +53,7 @@ export function SectionHeading({
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.1 }}
-          className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl"
+          className="text-base sm:text-lg text-slate-600 dark:text-slate-300 leading-relaxed max-w-2xl font-normal"
         >
           {description}
         </motion.p>

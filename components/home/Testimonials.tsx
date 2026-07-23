@@ -97,16 +97,16 @@ export function Testimonials() {
                   <Star key={j} className="w-4 h-4 fill-blue-400 text-blue-400" />
                 ))}
               </div>
-              <p className="text-lg leading-relaxed mb-6">&ldquo;{t.quote}&rdquo;</p>
+              <p className="text-base sm:text-lg text-slate-700 dark:text-slate-200 leading-relaxed mb-6 font-normal">&ldquo;{t.quote}&rdquo;</p>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500/20 to-sky-400/10 flex items-center justify-center text-blue-400 font-display font-bold text-sm">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500/20 to-sky-400/10 flex items-center justify-center text-blue-600 dark:text-blue-400 font-display font-bold text-sm">
                     {t.logo}
                   </div>
                   <div>
-                    <div className="font-semibold text-sm">{t.author}</div>
-                    <div className="text-xs text-muted-foreground">{t.role}</div>
-                    <div className="text-xs text-muted-foreground/60">{t.location}</div>
+                    <div className="font-bold text-slate-900 dark:text-white text-sm">{t.author}</div>
+                    <div className="text-xs text-slate-600 dark:text-slate-300 font-medium">{t.role}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400">{t.location}</div>
                   </div>
                 </div>
                 <div className="text-right">

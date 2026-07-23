@@ -146,13 +146,13 @@ export function WhyCyberGuard() {
                     <div className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-blue-500/10 mb-3">
                       <module.icon className="w-5 h-5 text-blue-400" />
                     </div>
-                    <div className="font-display font-semibold text-sm leading-snug">{module.name}</div>
+                    <div className="font-display font-semibold text-sm leading-snug text-slate-900 dark:text-slate-100">{module.name}</div>
                   </div>
                 }
                 back={
                   <div className="glass-strong rounded-2xl h-full p-4 flex flex-col items-center justify-center text-center border border-blue-500/20">
                     <module.icon className="w-5 h-5 text-blue-400 mb-2" />
-                    <p className="text-[11px] text-muted-foreground leading-relaxed font-sans">{module.benefit}</p>
+                    <p className="text-[11px] text-slate-700 dark:text-slate-200 leading-relaxed font-sans">{module.benefit}</p>
                   </div>
                 }
               />
@@ -165,7 +165,7 @@ export function WhyCyberGuard() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-12 flex items-center justify-center gap-2 text-sm text-muted-foreground"
+          className="mt-12 flex items-center justify-center gap-2 text-sm text-slate-600 dark:text-slate-300 font-medium"
         >
           <span>Tap a card to see the benefit</span>
           <ArrowRight className="w-4 h-4 text-blue-400 animate-bounce" />

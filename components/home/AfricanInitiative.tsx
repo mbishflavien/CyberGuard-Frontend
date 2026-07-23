@@ -765,16 +765,16 @@ export function AfricanInitiative() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.08, ease: [0.16, 1, 0.3, 1] }}
-                className="flex gap-4 p-5 rounded-2xl bg-white dark:bg-slate-950/40 border border-slate-200/80 dark:border-white/5 shadow-sm hover:border-blue-500/30 dark:hover:border-blue-500/20 hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all group duration-300"
+                className="flex gap-4 p-5 rounded-2xl bg-white/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/10 shadow-sm hover:border-blue-500/40 hover:bg-white dark:hover:bg-slate-900/90 transition-all group duration-300"
               >
-                <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-100 dark:group-hover:bg-blue-500/20 transition-all duration-300">
+                <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/20 transition-all duration-300">
                   <init.icon className="w-5 h-5 text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform duration-300" />
                 </div>
                 <div>
                   <h3 className="font-display font-bold text-sm mb-1 text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                     {init.title}
                   </h3>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                  <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed">
                     {init.description}
                   </p>
                 </div>

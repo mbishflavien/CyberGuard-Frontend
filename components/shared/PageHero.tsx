@@ -82,7 +82,7 @@ export function PageHero({ eyebrow, title, description, children }: PageHeroProp
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="inline-block text-xs font-mono uppercase tracking-[0.2em] text-blue-500 dark:text-blue-400/80 px-3 py-1 rounded-full glass mb-6"
+            className="inline-block text-xs font-mono uppercase tracking-[0.2em] text-blue-600 dark:text-blue-400 font-bold px-3 py-1 rounded-full glass mb-6 border border-blue-500/20"
           >
             {eyebrow}
           </motion.span>
@@ -91,7 +91,7 @@ export function PageHero({ eyebrow, title, description, children }: PageHeroProp
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-6"
+          className="font-display text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight leading-[1.1] mb-6 text-slate-900 dark:text-white"
         >
           {title}
         </motion.h1>
@@ -100,7 +100,7 @@ export function PageHero({ eyebrow, title, description, children }: PageHeroProp
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto"
+            className="text-lg text-slate-700 dark:text-slate-200 leading-relaxed max-w-2xl mx-auto font-normal"
           >
             {description}
           </motion.p>

@@ -20,7 +20,7 @@ export function TrustBar() {
   return (
     <section className="relative py-12 border-y border-white/5 overflow-hidden">
       <div className="text-center mb-6">
-        <span className="text-xs font-mono uppercase tracking-[0.2em] text-muted-foreground">
+        <span className="text-xs font-mono uppercase tracking-[0.2em] text-slate-700 dark:text-slate-300 font-semibold">
           One platform. Ten modules. Zero blind spots.
         </span>
       </div>
@@ -30,8 +30,8 @@ export function TrustBar() {
             key={i}
             className="flex items-center gap-2.5 px-6 py-3 rounded-xl glass shrink-0"
           >
-            <item.icon className="w-5 h-5 text-blue-400" />
-            <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">
+            <item.icon className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 whitespace-nowrap">
               {item.label}
             </span>
           </div>

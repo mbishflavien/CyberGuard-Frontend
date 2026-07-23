@@ -49,13 +49,13 @@ export function Compliance() {
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-blue-500/10 mb-4">
                     <cert.icon className="w-7 h-7 text-blue-400" />
                   </div>
-                  <div className="font-display font-bold text-sm">{cert.name}</div>
+                  <div className="font-display font-bold text-sm text-slate-900 dark:text-white">{cert.name}</div>
                 </div>
                 {/* Back */}
                 <div className="absolute inset-0 backface-hidden rotate-y-180 glass-strong rounded-2xl p-5 text-center flex flex-col items-center justify-center border border-blue-500/20">
                   <cert.icon className="w-6 h-6 text-blue-400 mb-3" />
-                  <div className="font-display font-bold text-sm mb-2">{cert.name}</div>
-                  <p className="text-xs text-muted-foreground leading-tight">{cert.description}</p>
+                  <div className="font-display font-bold text-sm text-slate-900 dark:text-white mb-2">{cert.name}</div>
+                  <p className="text-xs text-slate-700 dark:text-slate-200 leading-tight font-medium">{cert.description}</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -71,7 +71,7 @@ export function Compliance() {
         >
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-glow" />
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-slate-700 dark:text-slate-200 font-medium">
               All frameworks monitored continuously · Audit-ready reports generated on demand
             </span>
           </div>

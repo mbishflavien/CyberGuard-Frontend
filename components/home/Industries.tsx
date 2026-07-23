@@ -91,27 +91,27 @@ export function Industries() {
                         <industry.icon className="w-6 h-6 text-blue-500 dark:text-blue-400 transform-gpu backface-hidden" style={{ transform: 'translate3d(0,0,0)' }} />
                       </div>
                       <h3 className="font-display text-xl font-bold mb-2 text-slate-900 dark:text-white">{industry.name}</h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed flex-1">
+                      <p className="text-sm text-slate-700 dark:text-slate-200 leading-relaxed flex-1">
                         {industry.description}
                       </p>
-                      <div className="flex items-center gap-1.5 text-sm text-blue-500 dark:text-blue-400 font-semibold mt-4">
+                      <div className="flex items-center gap-1.5 text-sm text-blue-600 dark:text-blue-400 font-semibold mt-4">
                         Flip to see challenges <ArrowRight className="w-3.5 h-3.5" />
                       </div>
                     </div>
                   </div>
                 }
                 back={
-                  <div className="bg-white/80 dark:bg-slate-950/80 border border-blue-500/30 dark:border-blue-500/20 backdrop-blur-lg rounded-3xl h-full p-6 flex flex-col relative overflow-hidden select-none shadow-md">
+                  <div className="bg-white/90 dark:bg-slate-900/90 border border-blue-500/30 backdrop-blur-lg rounded-3xl h-full p-6 flex flex-col relative overflow-hidden select-none shadow-md">
                     <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent opacity-50" />
                     <div className="relative z-10 flex flex-col h-full justify-between">
                       <div>
                         <h3 className="font-display text-lg font-bold mb-3 text-blue-600 dark:text-blue-400">{industry.name}</h3>
                         <div className="mb-4">
-                          <div className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Challenges</div>
+                          <div className="text-[10px] font-mono uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5 font-bold">Challenges</div>
                           <ul className="space-y-1">
                             {industry.challenges.map((c) => (
-                              <li key={c} className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
-                                <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
+                              <li key={c} className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-200 font-medium">
+                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 dark:bg-red-400" />
                                 {c}
                               </li>
                             ))}
@@ -120,7 +120,7 @@ export function Industries() {
                       </div>
                       <div>
                         <div className="text-[10px] font-mono uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-1.5 font-bold">CyberGuard Solution</div>
-                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-medium">{industry.solution}</p>
+                        <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-medium">{industry.solution}</p>
                       </div>
                     </div>
                   </div>

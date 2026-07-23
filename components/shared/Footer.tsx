@@ -61,8 +61,8 @@ export function Footer() {
         <Marquee speed="slow">
           {marqueeItems.map((item, i) => (
             <div key={i} className="flex items-center gap-3 px-8 shrink-0">
-              <Shield className="w-4 h-4 text-blue-400/50" />
-              <span className="text-sm font-mono text-muted-foreground">{item}</span>
+              <Shield className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+              <span className="text-sm font-mono text-slate-700 dark:text-slate-200 font-medium">{item}</span>
             </div>
           ))}
         </Marquee>
@@ -73,21 +73,21 @@ export function Footer() {
           <div className="col-span-2">
             <Link href="/" className="flex items-center gap-2.5 mb-4">
               <Logo />
-              <span className="font-display text-xl font-bold tracking-tight">
-                Cyber<span className="text-blue-500 dark:text-blue-400">Guard</span>
+              <span className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+                Cyber<span className="text-blue-600 dark:text-blue-400">Guard</span>
               </span>
             </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed max-w-xs mb-6">
+            <p className="text-sm text-slate-600 dark:text-slate-200 leading-relaxed max-w-xs mb-6">
               Africa&apos;s first AI-native cybersecurity platform. One platform, zero
               blind spots, built for African businesses.
             </p>
             <div className="space-y-2 mb-6">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Mail className="w-4 h-4 text-blue-400/60" />
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-200">
+                <Mail className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 hello@cyberguard.africa
               </div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4 text-blue-400/60" />
+              <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-200">
+                <MapPin className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                 Lagos · Nairobi · Johannesburg
               </div>
             </div>
@@ -101,7 +101,7 @@ export function Footer() {
                 <a
                   key={social.label}
                   href="#"
-                  className="w-9 h-9 rounded-lg glass flex items-center justify-center text-muted-foreground hover:text-blue-500 dark:hover:text-blue-400 hover:border-blue-500/20 dark:hover:border-blue-400/20 transition-colors"
+                  className="w-9 h-9 rounded-lg glass flex items-center justify-center text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-200/50 dark:hover:bg-white/10 border border-slate-200 dark:border-white/10 transition-colors"
                   aria-label={social.label}
                 >
                   <social.icon className="w-4 h-4" />
@@ -112,7 +112,7 @@ export function Footer() {
 
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h4 className="text-sm font-semibold text-foreground mb-4">
+              <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-4">
                 {section.title}
               </h4>
               <ul className="space-y-2.5">
@@ -120,7 +120,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-muted-foreground hover:text-blue-500 dark:hover:text-blue-400 transition-colors"
+                      className="text-sm text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
                     >
                       {link.label}
                     </Link>
@@ -132,11 +132,11 @@ export function Footer() {
         </div>
 
         <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-slate-600 dark:text-slate-300">
             © {new Date().getFullYear()} CyberGuard Technologies. All rights reserved.
             Built in Africa. Built for Africa.
           </p>
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-2 text-xs text-slate-300 font-medium">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse-glow" />
             All systems operational
           </div>

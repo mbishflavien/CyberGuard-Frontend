@@ -113,7 +113,7 @@ export function Pricing() {
 
         {/* Toggle */}
         <div className="mt-10 flex items-center justify-center gap-4">
-          <span className={`text-sm ${!yearly ? 'text-foreground' : 'text-muted-foreground'}`}>Monthly</span>
+          <span className={`text-sm font-medium ${!yearly ? 'text-white' : 'text-slate-400'}`}>Monthly</span>
           <button
             onClick={() => setYearly(!yearly)}
             className="relative w-14 h-7 rounded-full bg-white/10 transition-colors"
@@ -125,7 +125,7 @@ export function Pricing() {
               className="absolute top-1 w-5 h-5 rounded-full bg-gradient-to-r from-blue-500 to-sky-400"
             />
           </button>
-          <span className={`text-sm ${yearly ? 'text-foreground' : 'text-muted-foreground'}`}>
+          <span className={`text-sm font-medium ${yearly ? 'text-white' : 'text-slate-400'}`}>
             Yearly <span className="text-blue-400 text-xs">(Save 2 months)</span>
           </span>
         </div>
@@ -153,18 +153,18 @@ export function Pricing() {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-500/10 mb-5">
                 <plan.icon className="w-6 h-6 text-blue-400" />
               </div>
-              <h3 className="font-display text-xl font-bold mb-1">{plan.name}</h3>
-              <p className="text-sm text-muted-foreground mb-5">{plan.description}</p>
+              <h3 className="font-display text-xl font-bold mb-1 text-slate-900 dark:text-white">{plan.name}</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mb-5">{plan.description}</p>
               <div className="mb-6">
                 {plan.monthly !== null ? (
                   <>
-                    <span className="font-display text-4xl font-bold">
+                    <span className="font-display text-4xl font-bold text-slate-900 dark:text-white">
                       ${(yearly ? plan.yearly : plan.monthly).toLocaleString()}
                     </span>
-                    <span className="text-sm text-muted-foreground">/{yearly ? 'year' : 'month'}</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">/{yearly ? 'year' : 'month'}</span>
                   </>
                 ) : (
-                  <span className="font-display text-2xl font-bold text-muted-foreground">Custom</span>
+                  <span className="font-display text-2xl font-bold text-slate-700 dark:text-slate-300">Custom</span>
                 )}
               </div>
               <Link
@@ -172,14 +172,14 @@ export function Pricing() {
                 className={`block text-center w-full py-3 rounded-xl font-semibold transition-all mb-6 ${
                   plan.highlighted
                     ? 'bg-gradient-to-r from-blue-500 to-sky-400 text-white hover:shadow-[0_0_40px_-5px_hsla(199,89%,48%,0.5)]'
-                    : 'glass hover:bg-white/5'
+                    : 'glass hover:bg-slate-100 dark:hover:bg-white/5 text-slate-900 dark:text-white'
                 }`}
               >
                 {plan.monthly !== null ? 'Start Free Trial' : 'Contact Sales'}
               </Link>
               <ul className="space-y-2.5">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <li key={feature} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
                     <Check className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
                     {feature}
                   </li>
@@ -204,11 +204,11 @@ export function Pricing() {
                 <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-blue-500/10 mb-4">
                   <plan.icon className="w-6 h-6 text-blue-400" />
                 </div>
-                <h3 className="font-display text-xl font-bold mb-1">{plan.name}</h3>
-                <p className="text-sm text-muted-foreground mb-4">{plan.description}</p>
+                <h3 className="font-display text-xl font-bold mb-1 text-slate-900 dark:text-white">{plan.name}</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mb-4">{plan.description}</p>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-blue-400 hover:gap-3 transition-all"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:gap-3 transition-all"
                 >
                   Contact Sales <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -216,7 +216,7 @@ export function Pricing() {
               <div className="flex-1">
                 <ul className="space-y-2">
                   {plan.features.map((feature) => (
-                    <li key={feature} className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <li key={feature} className="flex items-start gap-2 text-sm text-slate-700 dark:text-slate-200">
                       <Check className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
                       {feature}
                     </li>

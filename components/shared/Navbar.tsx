@@ -50,8 +50,8 @@ export function Navbar() {
                 <Logo />
               </div>
             </div>
-            <span className="font-display text-xl font-bold tracking-tight">
-              Cyber<span className="text-blue-500 dark:text-blue-400">Guard</span>
+            <span className="font-display text-xl font-bold tracking-tight text-slate-900 dark:text-white">
+              Cyber<span className="text-blue-600 dark:text-blue-400">Guard</span>
             </span>
           </Link>
 
@@ -60,7 +60,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-foreground/5"
+                className="px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-200/50 dark:hover:bg-white/10"
               >
                 {link.label}
               </Link>

@@ -86,10 +86,10 @@ export function FAQ() {
                 value={`item-${i}`}
                 className="glass rounded-xl px-6 border border-white/5 data-[state=open]:border-blue-500/20 transition-colors"
               >
-                <AccordionTrigger className="text-left font-medium hover:no-underline py-5">
+                <AccordionTrigger className="text-left font-semibold text-slate-900 dark:text-white text-base hover:no-underline py-5">
                   {faq.question}
                 </AccordionTrigger>
-                <AccordionContent className="text-muted-foreground leading-relaxed pb-5">
+                <AccordionContent className="text-slate-700 dark:text-slate-200 text-sm leading-relaxed pb-5 font-normal">
                   {faq.answer}
                 </AccordionContent>
               </AccordionItem>
