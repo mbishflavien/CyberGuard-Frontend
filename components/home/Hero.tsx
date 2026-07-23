@@ -3,8 +3,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import { useRef } from 'react';
-import { ArrowRight, Calendar, ShieldCheck, Zap, Activity, Play, ChevronDown } from 'lucide-react';
-import { CyberBackgroundVideo } from '@/components/shared/CyberBackgroundVideo';
+import { ArrowRight, Calendar, ShieldCheck, Zap, Activity, Play } from 'lucide-react';
 
 export function Hero() {
   const containerRef = useRef<HTMLElement>(null);
@@ -24,9 +23,6 @@ export function Hero() {
     >
       {/* High-performance zero-latency cyber telemetry & dynamic video background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none select-none">
-        {/* Dynamic Matrix Rain layered with immersive high-contrast cybersecurity background video */}
-        <CyberBackgroundVideo videoOpacity={0.65} canvasOpacity={0.10} />
-
         {/* Dynamic network map layout */}
         <div className="absolute inset-0 bg-grid opacity-[0.06] dark:opacity-[0.12] [mask-image:radial-gradient(ellipse_at_center,black_45%,transparent_90%)]" />
 

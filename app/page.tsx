@@ -1,9 +1,6 @@
 import { Navbar } from '@/components/shared/Navbar';
 import { Footer } from '@/components/shared/Footer';
-import { Hero } from '@/components/home/Hero';
-import { TrustBar } from '@/components/home/TrustBar';
-import { Stats } from '@/components/home/Stats';
-import { WhyCyberGuard } from '@/components/home/WhyCyberGuard';
+import { HeroToWhyWrapper } from '@/components/home/HeroToWhyWrapper';
 import { PlatformArchitecture } from '@/components/home/PlatformArchitecture';
 import { ProductShowcase } from '@/components/home/ProductShowcase';
 import { AttackTimeline } from '@/components/home/AttackTimeline';
@@ -21,10 +18,7 @@ export default function Home() {
     <div className="relative min-h-screen bg-background overflow-x-hidden">
       <Navbar />
       <main>
-        <Hero />
-        <TrustBar />
-        <Stats />
-        <WhyCyberGuard />
+        <HeroToWhyWrapper />
         <PlatformArchitecture />
         <ProductShowcase />
         <AttackTimeline />

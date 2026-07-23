@@ -1,7 +1,7 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { SectionHeading } from '@/components/shared/SectionHeading';
 import {
   MapPin,
@@ -9,8 +9,6 @@ import {
   Briefcase,
   TrendingUp,
   Heart,
-  Activity,
-  Compass,
   Shield,
   Maximize2,
   ZoomIn,
@@ -64,21 +62,9 @@ const countries = [
 ];
 
 const connections = [
-  [0, 5], // Lagos - Accra
-  [0, 4], // Lagos - Dakar
-  [0, 2], // Lagos - Cape Town
-  [0, 3], // Lagos - Cairo
-  [0, 8], // Lagos - London
-  [0, 9], // Lagos - New York
-  [1, 6], // Nairobi - Addis
-  [1, 7], // Nairobi - Kigali
-  [1, 2], // Nairobi - Cape Town
-  [1, 3], // Nairobi - Cairo
-  [1, 12], // Nairobi - Singapore
-  [2, 11], // Cape Town - São Paulo
-  [3, 8], // Cairo - London
-  [10, 12], // Tokyo - Singapore
-  [9, 8], // New York - London
+  [0, 5], [0, 4], [0, 2], [0, 3], [0, 8], [0, 9],
+  [1, 6], [1, 7], [1, 2], [1, 3], [1, 12],
+  [2, 11], [3, 8], [10, 12], [9, 8],
 ];
 
 // Continent detection function
@@ -87,24 +73,19 @@ const isLand = (lat: number, lon: number) => {
   while (l > 180) l -= 360;
   while (l < -180) l += 360;
 
-  // AFRICA
   if (lat >= -35 && lat <= 37 && l >= -18 && l <= 51) {
     if (lat < 5 && l < 10 && lat > -15) {
       if (l < -5) return false;
       if (lat < 0 && l < 5) return false;
     }
-    if (lat > 12 && lat < 30 && l > 33 && l < 43) return false; // Red Sea
+    if (lat > 12 && lat < 30 && l > 33 && l < 43) return false;
     if (lat > 32 && l < -5) return false;
     return true;
   }
-
-  // EUROPE
   if (lat > 36 && lat <= 71 && l >= -10 && l <= 40) {
     if (lat < 42 && l > 15) return false;
     return true;
   }
-
-  // ASIA
   if (lat >= 1 && lat <= 75 && l > 40 && l <= 180) {
     if (lat < 22 && l > 68 && l < 88) return lat > 7;
     if (lat < 22 && l >= 95 && l < 110) return lat > 8;
@@ -119,8 +100,6 @@ const isLand = (lat: number, lon: number) => {
     }
     return true;
   }
-
-  // NORTH AMERICA
   if (lat >= 7 && lat <= 75 && l >= -170 && l <= -50) {
     if (lat < 25 && l > -100) {
       if (lat < 15 && l < -90) return false;
@@ -129,8 +108,6 @@ const isLand = (lat: number, lon: number) => {
     if (lat > 18 && lat < 30 && l > -97 && l < -81) return false;
     return true;
   }
-
-  // SOUTH AMERICA
   if (lat >= -56 && lat <= 12 && l >= -82 && l <= -34) {
     if (lat < -20) {
       const width = 20 - (lat + 20) * 0.4;
@@ -139,35 +116,25 @@ const isLand = (lat: number, lon: number) => {
     }
     return true;
   }
-
-  // AUSTRALIA
   if (lat >= -44 && lat <= -10 && l >= 112 && l <= 154) {
     if (lat < -40 && l > 143) return true;
     return lat >= -38;
   }
-
-  // MADAGASCAR & GREENLAND
   if (lat >= -26 && lat <= -11 && l >= 43 && l <= 51) return true;
   if (lat >= 60 && lat <= 83 && l >= -73 && l <= -10) return true;
-
   return false;
 };
 
 // Generate pre-calculated 3D unit coordinates for land points
-const generateLandPoints3D = () => {
-  const points: { id: string; isAfrica: boolean; x3: number; y3: number; z3: number }[] = [];
-  const latStep = 5.0;
-  const lonStep = 5.0;
-
-  for (let lat = -60; lat <= 75; lat += latStep) {
-    for (let lon = -180; lon <= 180; lon += lonStep) {
+const LAND_POINTS_3D = (() => {
+  const points: { isAfrica: boolean; x3: number; y3: number; z3: number }[] = [];
+  for (let lat = -60; lat <= 75; lat += 4.5) {
+    for (let lon = -180; lon <= 180; lon += 4.5) {
       if (isLand(lat, lon)) {
         const isAfrica = lat >= -35 && lat <= 37 && lon >= -18 && lon <= 51;
         const latRad = (lat * Math.PI) / 180;
         const lonRad = (lon * Math.PI) / 180;
-        
         points.push({
-          id: `${lat.toFixed(1)}_${lon.toFixed(1)}`,
           isAfrica,
           x3: Math.cos(latRad) * Math.sin(lonRad),
           y3: -Math.sin(latRad),
@@ -177,12 +144,8 @@ const generateLandPoints3D = () => {
     }
   }
   return points;
-};
+})();
 
-// Precomputed land matrix
-const LAND_POINTS_3D = generateLandPoints3D();
-
-// Pre-calculate unit vectors for active nodes
 const NODES_3D = countries.map((country, idx) => {
   const latRad = (country.lat * Math.PI) / 180;
   const lonRad = (country.lon * Math.PI) / 180;
@@ -196,262 +159,414 @@ const NODES_3D = countries.map((country, idx) => {
 });
 
 export function AfricanInitiative() {
-  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
-
-  // Rotational & Camera States
-  const [rotationX, setRotationX] = useState(20); // Longitude Yaw
-  const [rotationY, setRotationY] = useState(12); // Latitude Pitch
-  const [zoom, setZoom] = useState(1.0); // Dynamic Zoom Scale (0.75 - 2.0)
-
-  // Kinetic Inertia Velocity
-  const [vx, setVx] = useState(0);
-  const [vy, setVy] = useState(0);
-
-  const [isDragging, setIsDragging] = useState(false);
-  const [lastInteractionTime, setLastInteractionTime] = useState(0);
-  const [targetRotation, setTargetRotation] = useState<{ x: number; y: number } | null>(null);
-
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef({ x: 0, y: 0 });
 
-  // Smooth Interpolation towards clicked target coordinates
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+  const [zoomDisplay, setZoomDisplay] = useState(100);
+
+  // Mutable state ref to allow 60fps canvas updates with zero React re-render overhead
+  const stateRef = useRef({
+    rx: 20,
+    ry: 12,
+    vx: 0,
+    vy: 0,
+    zoom: 1.0,
+    targetRx: null as number | null,
+    targetRy: null as number | null,
+    isDragging: false,
+    dragLastX: 0,
+    dragLastY: 0,
+    hoveredIdx: null as number | null,
+    pulseTime: 0,
+  });
+
+  // Sync stateRef with React hovered state
   useEffect(() => {
-    if (!targetRotation || isDragging) return;
+    stateRef.current.hoveredIdx = hoveredIdx;
+  }, [hoveredIdx]);
 
-    let frameId: number;
-    const animateTarget = () => {
-      let isDone = true;
+  // High performance Canvas 2D Rendering Loop
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
-      setRotationX((curr) => {
-        let diff = targetRotation.x - curr;
-        while (diff > 180) diff -= 360;
-        while (diff < -180) diff += 360;
-        if (Math.abs(diff) < 0.1) return targetRotation.x;
-        isDone = false;
-        return (curr + diff * 0.12 + 360) % 360;
+    const ctx = canvas.getContext('2d', { alpha: true });
+    if (!ctx) return;
+
+    let animId: number;
+
+    const render = () => {
+      animId = requestAnimationFrame(render);
+
+      const state = stateRef.current;
+      state.pulseTime += 0.025;
+
+      // Smooth target interpolation
+      if (state.targetRx !== null && state.targetRy !== null && !state.isDragging) {
+        let diffX = state.targetRx - state.rx;
+        while (diffX > 180) diffX -= 360;
+        while (diffX < -180) diffX += 360;
+        const diffY = state.targetRy - state.ry;
+
+        if (Math.abs(diffX) < 0.1 && Math.abs(diffY) < 0.1) {
+          state.rx = state.targetRx;
+          state.ry = state.targetRy;
+          state.targetRx = null;
+          state.targetRy = null;
+        } else {
+          state.rx = (state.rx + diffX * 0.12 + 360) % 360;
+          state.ry += diffY * 0.12;
+        }
+      } else if (!state.isDragging) {
+        // Kinetic momentum or smooth auto-rotation
+        if (Math.abs(state.vx) > 0.015 || Math.abs(state.vy) > 0.015) {
+          state.rx = (state.rx + state.vx + 360) % 360;
+          state.ry = Math.max(-65, Math.min(65, state.ry + state.vy));
+          state.vx *= 0.92;
+          state.vy *= 0.92;
+        } else {
+          state.rx = (state.rx + 0.12) % 360;
+        }
+      }
+
+      // Handle HiDPI Canvas Scaling
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
+
+      if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+        canvas.width = width * dpr;
+        canvas.height = height * dpr;
+      }
+
+      ctx.save();
+      ctx.scale(dpr, dpr);
+      ctx.clearRect(0, 0, width, height);
+
+      const centerX = width * 0.5;
+      const centerY = height * 0.52;
+      const baseR = Math.min(width, height) * 0.36;
+      const R = baseR * state.zoom;
+
+      // Rotation matrix values
+      const radX = (state.rx * Math.PI) / 180;
+      const radY = (state.ry * Math.PI) / 180;
+      const cosY = Math.cos(radX);
+      const sinY = Math.sin(radX);
+      const cosX = Math.cos(radY);
+      const sinX = Math.sin(radY);
+
+      // 1. Atmosphere Glow & Outer Ring
+      const atmoGrad = ctx.createRadialGradient(centerX, centerY, R * 0.82, centerX, centerY, R * 1.15);
+      atmoGrad.addColorStop(0, 'rgba(56, 189, 248, 0.12)');
+      atmoGrad.addColorStop(0.7, 'rgba(14, 165, 233, 0.05)');
+      atmoGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+      ctx.fillStyle = atmoGrad;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, R * 1.15, 0, Math.PI * 2);
+      ctx.fill();
+
+      // 2. Globe Dark Sphere Backdrop
+      const sphereGrad = ctx.createRadialGradient(centerX - R * 0.2, centerY - R * 0.2, R * 0.1, centerX, centerY, R);
+      sphereGrad.addColorStop(0, '#0a1d37');
+      sphereGrad.addColorStop(0.65, '#020914');
+      sphereGrad.addColorStop(1, '#01040a');
+      ctx.fillStyle = sphereGrad;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, R, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, R, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 3. Render Land Points
+      for (let i = 0; i < LAND_POINTS_3D.length; i++) {
+        const pt = LAND_POINTS_3D[i];
+        const xRotY = pt.x3 * cosY - pt.z3 * sinY;
+        const zRotY = pt.x3 * sinY + pt.z3 * cosY;
+        const yFinal = pt.y3 * cosX - zRotY * sinX;
+        const zFinal = pt.y3 * sinX + zRotY * cosX;
+
+        const px = centerX + R * xRotY;
+        const py = centerY + R * yFinal;
+
+        if (zFinal < 0) {
+          // Back hemisphere dots
+          ctx.fillStyle = 'rgba(56, 189, 248, 0.1)';
+          ctx.beginPath();
+          ctx.arc(px, py, 0.8 * state.zoom, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Front hemisphere dots
+          const normZ = (zFinal + 1) / 2;
+          const alpha = Math.max(0.12, normZ * (pt.isAfrica ? 0.95 : 0.55));
+          const dotR = Math.max(0.9, normZ * (pt.isAfrica ? 1.8 : 1.3) * state.zoom);
+
+          ctx.fillStyle = pt.isAfrica ? `rgba(34, 211, 238, ${alpha})` : `rgba(56, 189, 248, ${alpha * 0.7})`;
+          ctx.beginPath();
+          ctx.arc(px, py, dotR, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Project Nodes
+      const projNodes = NODES_3D.map((node) => {
+        const xRotY = node.x3 * cosY - node.z3 * sinY;
+        const zRotY = node.x3 * sinY + node.z3 * cosY;
+        const yFinal = node.y3 * cosX - zRotY * sinX;
+        const zFinal = node.y3 * sinX + zRotY * cosX;
+        return {
+          ...node,
+          px: centerX + R * xRotY,
+          py: centerY + R * yFinal,
+          pz: zFinal,
+        };
       });
 
-      setRotationY((curr) => {
-        const diff = targetRotation.y - curr;
-        if (Math.abs(diff) < 0.1) return targetRotation.y;
-        isDone = false;
-        return curr + diff * 0.12;
-      });
+      // 4. Render Connection Arcs
+      for (let c = 0; c < connections.length; c++) {
+        const [aIdx, bIdx] = connections[c];
+        const nodeA = projNodes[aIdx];
+        const nodeB = projNodes[bIdx];
 
-      if (!isDone) {
-        frameId = requestAnimationFrame(animateTarget);
-      } else {
-        setTargetRotation(null);
-      }
-    };
+        if (nodeA.pz < -0.2 && nodeB.pz < -0.2) continue;
 
-    frameId = requestAnimationFrame(animateTarget);
-    return () => cancelAnimationFrame(frameId);
-  }, [targetRotation, isDragging]);
+        const isAActive = state.hoveredIdx === aIdx;
+        const isBActive = state.hoveredIdx === bIdx;
+        const isHighlighted = isAActive || isBActive;
+        const isAnyHovered = state.hoveredIdx !== null;
 
-  // Inertia and Auto-Rotation Loop
-  useEffect(() => {
-    if (isDragging || targetRotation) return;
+        const segs = 16;
+        ctx.beginPath();
 
-    const timeSinceLastActive = Date.now() - lastInteractionTime;
-    if (timeSinceLastActive < 3000) {
-      const timer = setTimeout(() => {
-        setRotationX((r) => r);
-      }, 800);
-      return () => clearTimeout(timer);
-    }
+        for (let s = 0; s <= segs; s++) {
+          const t = s / segs;
+          let px = nodeA.x3 * (1 - t) + nodeB.x3 * t;
+          let py = nodeA.y3 * (1 - t) + nodeB.y3 * t;
+          let pz = nodeA.z3 * (1 - t) + nodeB.z3 * t;
 
-    let frameId: number;
-    const updatePhysics = () => {
-      if (Math.abs(vx) > 0.015 || Math.abs(vy) > 0.015) {
-        setRotationX((r) => (r + vx + 360) % 360);
-        setRotationY((r) => Math.max(-65, Math.min(65, r + vy)));
-        setVx((v) => v * 0.93);
-        setVy((v) => v * 0.93);
-      } else {
-        setRotationX((r) => (r + 0.09) % 360);
-      }
-      frameId = requestAnimationFrame(updatePhysics);
-    };
+          const len = Math.sqrt(px * px + py * py + pz * pz) || 1;
+          const nx = px / len;
+          const ny = py / len;
+          const nz = pz / len;
 
-    frameId = requestAnimationFrame(updatePhysics);
-    return () => cancelAnimationFrame(frameId);
-  }, [isDragging, lastInteractionTime, vx, vy, targetRotation]);
+          const arcLift = 0.08 * Math.sin(Math.PI * t);
+          const currentR = R * (1 + arcLift);
 
-  // Pointer & Drag Handlers for zero-latency Mouse & Touch Dragging
-  const handleDragStart = (clientX: number, clientY: number) => {
-    setIsDragging(true);
-    setTargetRotation(null);
-    dragRef.current = { x: clientX, y: clientY };
-    setVx(0);
-    setVy(0);
-    setLastInteractionTime(Date.now());
-  };
+          const lx = nx * currentR;
+          const ly = ny * currentR;
+          const lz = nz * currentR;
 
-  const handleDragMove = (clientX: number, clientY: number) => {
-    if (!isDragging) return;
-    const deltaX = clientX - dragRef.current.x;
-    const deltaY = clientY - dragRef.current.y;
+          const xRotY = lx * cosY - lz * sinY;
+          const zRotY = lx * sinY + lz * cosY;
+          const yFinal = ly * cosX - zRotY * sinX;
 
-    const sensitivity = 0.40;
-    const newVx = deltaX * sensitivity;
-    const newVy = -deltaY * sensitivity;
+          const sx = centerX + xRotY;
+          const sy = centerY + yFinal;
 
-    setRotationX((r) => (r + newVx + 360) % 360);
-    setRotationY((r) => Math.max(-65, Math.min(65, r + newVy)));
+          if (s === 0) ctx.moveTo(sx, sy);
+          else ctx.lineTo(sx, sy);
+        }
 
-    setVx(newVx);
-    setVy(newVy);
+        ctx.strokeStyle = isHighlighted
+          ? 'rgba(34, 211, 238, 0.95)'
+          : isAnyHovered
+          ? 'rgba(56, 189, 248, 0.08)'
+          : 'rgba(56, 189, 248, 0.4)';
+        ctx.lineWidth = isHighlighted ? 2.2 : 1.1;
+        ctx.stroke();
 
-    dragRef.current = { x: clientX, y: clientY };
-    setLastInteractionTime(Date.now());
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
-  // Scroll Wheel Zoom
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    const zoomDelta = e.deltaY * -0.0015;
-    setZoom((prev) => Math.min(1.85, Math.max(0.75, prev + zoomDelta)));
-    setLastInteractionTime(Date.now());
-  }, []);
-
-  // Smooth camera centering on clicked hub
-  const flyToNode = (lat: number, lon: number) => {
-    setTargetRotation({
-      x: (-lon + 360) % 360,
-      y: lat,
-    });
-    setVx(0);
-    setVy(0);
-    setLastInteractionTime(Date.now());
-  };
-
-  const handleResetCamera = () => {
-    setTargetRotation({ x: 20, y: 12 });
-    setZoom(1.0);
-    setVx(0);
-    setVy(0);
-  };
-
-  // Helper to fix cross-environment floating point hydration precision mismatch
-  const r3 = (n: number) => Number(n.toFixed(3));
-
-  // Zero-Latency Multi-Axis Matrix Math values
-  const transformMath = useMemo(() => {
-    const rx = (rotationX * Math.PI) / 180;
-    const ry = (rotationY * Math.PI) / 180;
-    return {
-      cosY: Math.cos(rx),
-      sinY: Math.sin(rx),
-      cosX: Math.cos(ry),
-      sinX: Math.sin(ry),
-      R: 34 * zoom,
-    };
-  }, [rotationX, rotationY, zoom]);
-
-  // Projected 3D Land Points
-  const projectedLandDots = useMemo(() => {
-    const { cosY, sinY, cosX, sinX, R } = transformMath;
-    return LAND_POINTS_3D.map((pt) => {
-      const xRotY = pt.x3 * cosY - pt.z3 * sinY;
-      const zRotY = pt.x3 * sinY + pt.z3 * cosY;
-      const yFinal = pt.y3 * cosX - zRotY * sinX;
-      const zFinal = pt.y3 * sinX + zRotY * cosX;
-
-      return {
-        id: pt.id,
-        x: r3(50 + R * xRotY),
-        y: r3(52 + R * yFinal),
-        z: r3(zFinal),
-        isAfrica: pt.isAfrica,
-      };
-    });
-  }, [transformMath]);
-
-  // Projected 3D Active Hub Nodes
-  const projectedNodes = useMemo(() => {
-    const { cosY, sinY, cosX, sinX, R } = transformMath;
-    return NODES_3D.map((node) => {
-      const xRotY = node.x3 * cosY - node.z3 * sinY;
-      const zRotY = node.x3 * sinY + node.z3 * cosY;
-      const yFinal = node.y3 * cosX - zRotY * sinX;
-      const zFinal = node.y3 * sinX + zRotY * cosX;
-
-      return {
-        ...node,
-        projX: r3(50 + R * xRotY),
-        projY: r3(52 + R * yFinal),
-        projZ: r3(zFinal),
-      };
-    });
-  }, [transformMath]);
-
-  // Projected 3D Arcs
-  const projectedConnections = useMemo(() => {
-    const { cosY, sinY, cosX, sinX, R } = transformMath;
-    const segmentsCount = 16;
-
-    return connections.map(([a, b], idx) => {
-      const nodeA = NODES_3D[a];
-      const nodeB = NODES_3D[b];
-
-      let pathStr = '';
-      let avgZ = 0;
-
-      for (let i = 0; i <= segmentsCount; i++) {
-        const t = i / segmentsCount;
-
-        // Spherical linear interpolation in 3D
-        let px = nodeA.x3 * (1 - t) + nodeB.x3 * t;
-        let py = nodeA.y3 * (1 - t) + nodeB.y3 * t;
-        let pz = nodeA.z3 * (1 - t) + nodeB.z3 * t;
-
+        // Traveling energy particle along the arc
+        const pT = (state.pulseTime * 0.4 + c * 0.15) % 1;
+        let px = nodeA.x3 * (1 - pT) + nodeB.x3 * pT;
+        let py = nodeA.y3 * (1 - pT) + nodeB.y3 * pT;
+        let pz = nodeA.z3 * (1 - pT) + nodeB.z3 * pT;
         const len = Math.sqrt(px * px + py * py + pz * pz) || 1;
-        const nx = px / len;
-        const ny = py / len;
-        const nz = pz / len;
+        const liftR = R * (1 + 0.08 * Math.sin(Math.PI * pT));
 
-        // Elevated cyber arc
-        const lift = 3.2 * Math.sin(Math.PI * t);
-        const currentR = R + lift;
+        const lx = (px / len) * liftR;
+        const ly = (py / len) * liftR;
+        const lz = (pz / len) * liftR;
 
-        const lx = nx * currentR;
-        const ly = ny * currentR;
-        const lz = nz * currentR;
-
-        // Multi-axis rotation projection
         const xRotY = lx * cosY - lz * sinY;
         const zRotY = lx * sinY + lz * cosY;
         const yFinal = ly * cosX - zRotY * sinX;
         const zFinal = ly * sinX + zRotY * cosX;
 
-        const sx = 50 + xRotY;
-        const sy = 52 + yFinal;
-
-        if (i === 0) {
-          pathStr += `M ${sx.toFixed(2)} ${sy.toFixed(2)}`;
-        } else {
-          pathStr += ` L ${sx.toFixed(2)} ${sy.toFixed(2)}`;
+        if (zFinal > 0) {
+          ctx.fillStyle = isHighlighted ? '#ffffff' : '#38bdf8';
+          ctx.beginPath();
+          ctx.arc(centerX + xRotY, centerY + yFinal, isHighlighted ? 3 : 2, 0, Math.PI * 2);
+          ctx.fill();
         }
-        avgZ += zFinal;
       }
 
-      const isAHighlighted = hoveredIdx === a;
-      const isBHighlighted = hoveredIdx === b;
-      const isDirectlyConnected = isAHighlighted || isBHighlighted;
+      // 5. Render Nodes and Labels
+      for (let n = 0; n < projNodes.length; n++) {
+        const node = projNodes[n];
+        if (node.pz < -0.15) continue;
 
-      return {
-        d: pathStr,
-        isFront: (avgZ / (segmentsCount + 1)) >= -3,
-        isCore: nodeA.hub && nodeB.hub,
-        isHighlighted: isDirectlyConnected,
-      };
-    });
-  }, [transformMath, hoveredIdx]);
+        const isHovered = state.hoveredIdx === node.originalIdx;
+        const isAnyHovered = state.hoveredIdx !== null;
+        const isDimmed = isAnyHovered && !isHovered && !connections.some(([a, b]) => (a === node.originalIdx || b === node.originalIdx) && (a === state.hoveredIdx || b === state.hoveredIdx));
+
+        const alpha = isDimmed ? 0.25 : Math.min(1, (node.pz + 0.15) * 2);
+
+        ctx.save();
+        ctx.globalAlpha = alpha;
+
+        // Pulsing halo for master hubs
+        if (node.hub && !isDimmed) {
+          const pulseR = (4 + Math.sin(state.pulseTime * 3 + n) * 3) * state.zoom;
+          ctx.strokeStyle = isHovered ? 'rgba(34, 211, 238, 0.8)' : 'rgba(56, 189, 248, 0.4)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(node.px, node.py, pulseR + (node.hub ? 6 : 3), 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Outer node circle
+        ctx.fillStyle = isHovered ? '#22d3ee' : node.hub ? '#38bdf8' : '#3b82f6';
+        ctx.beginPath();
+        ctx.arc(node.px, node.py, (node.hub ? 5.5 : 3.5) * state.zoom, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.arc(node.px, node.py, (node.hub ? 5.5 : 3.5) * state.zoom, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Node Name Label
+        const labelText = node.name.replace(' Hub', '').replace(' Link', '').replace(' Node', '');
+        ctx.font = `${isHovered || node.hub ? 'bold 12px' : '10px'} monospace`;
+        ctx.textAlign = node.px > centerX ? 'left' : 'right';
+        ctx.textBaseline = 'middle';
+
+        const labelX = node.px + (node.px > centerX ? 10 : -10);
+        const labelY = node.py;
+
+        ctx.strokeStyle = 'rgba(1, 4, 9, 0.9)';
+        ctx.lineWidth = 3.5;
+        ctx.strokeText(labelText, labelX, labelY);
+
+        ctx.fillStyle = isHovered ? '#22d3ee' : node.hub ? '#ffffff' : '#94a3b8';
+        ctx.fillText(labelText, labelX, labelY);
+
+        ctx.restore();
+      }
+
+      ctx.restore();
+    };
+
+    animId = requestAnimationFrame(render);
+    return () => cancelAnimationFrame(animId);
+  }, []);
+
+  // Pointer Interaction Handlers for zero-latency Mouse & Touch Dragging
+  const handlePointerDown = (e: React.PointerEvent) => {
+    stateRef.current.isDragging = true;
+    stateRef.current.dragLastX = e.clientX;
+    stateRef.current.dragLastY = e.clientY;
+    stateRef.current.vx = 0;
+    stateRef.current.vy = 0;
+    stateRef.current.targetRx = null;
+    stateRef.current.targetRy = null;
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    const state = stateRef.current;
+    if (state.isDragging) {
+      const deltaX = e.clientX - state.dragLastX;
+      const deltaY = e.clientY - state.dragLastY;
+
+      state.vx = deltaX * 0.35;
+      state.vy = -deltaY * 0.35;
+
+      state.rx = (state.rx + state.vx + 360) % 360;
+      state.ry = Math.max(-65, Math.min(65, state.ry + state.vy));
+
+      state.dragLastX = e.clientX;
+      state.dragLastY = e.clientY;
+      return;
+    }
+
+    // Hover detection over projected nodes
+    if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+
+    const width = rect.width;
+    const height = rect.height;
+    const centerX = width * 0.5;
+    const centerY = height * 0.52;
+    const baseR = Math.min(width, height) * 0.36;
+    const R = baseR * state.zoom;
+
+    const radX = (state.rx * Math.PI) / 180;
+    const radY = (state.ry * Math.PI) / 180;
+    const cosY = Math.cos(radX);
+    const sinY = Math.sin(radX);
+    const cosX = Math.cos(radY);
+    const sinX = Math.sin(radY);
+
+    let foundIdx: number | null = null;
+    let minDist = 18;
+
+    for (let i = 0; i < NODES_3D.length; i++) {
+      const node = NODES_3D[i];
+      const xRotY = node.x3 * cosY - node.z3 * sinY;
+      const zRotY = node.x3 * sinY + node.z3 * cosY;
+      const yFinal = node.y3 * cosX - zRotY * sinX;
+      const zFinal = node.y3 * sinX + zRotY * cosX;
+
+      if (zFinal < -0.1) continue;
+
+      const px = centerX + R * xRotY;
+      const py = centerY + R * yFinal;
+
+      const dist = Math.hypot(mx - px, my - py);
+      if (dist < minDist) {
+        minDist = dist;
+        foundIdx = i;
+      }
+    }
+
+    if (foundIdx !== state.hoveredIdx) {
+      setHoveredIdx(foundIdx);
+    }
+  };
+
+  const handlePointerUp = () => {
+    stateRef.current.isDragging = false;
+  };
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const zoomDelta = e.deltaY * -0.0012;
+    const newZoom = Math.min(1.85, Math.max(0.75, stateRef.current.zoom + zoomDelta));
+    stateRef.current.zoom = newZoom;
+    setZoomDisplay(Math.round(newZoom * 100));
+  }, []);
+
+  const flyToNode = (lat: number, lon: number) => {
+    stateRef.current.targetRx = (-lon + 360) % 360;
+    stateRef.current.targetRy = lat;
+    stateRef.current.vx = 0;
+    stateRef.current.vy = 0;
+  };
+
+  const handleResetCamera = () => {
+    stateRef.current.targetRx = 20;
+    stateRef.current.targetRy = 12;
+    stateRef.current.zoom = 1.0;
+    setZoomDisplay(100);
+  };
 
   return (
     <section className="relative py-24 overflow-hidden select-none">
@@ -469,7 +584,7 @@ export function AfricanInitiative() {
         />
 
         <div className="mt-16 grid lg:grid-cols-12 gap-12 items-center">
-          {/* Holographic Interactive Globe Box */}
+          {/* Holographic Interactive Canvas Globe Container */}
           <div className="lg:col-span-7 flex flex-col gap-5">
             <motion.div
               ref={containerRef}
@@ -477,66 +592,39 @@ export function AfricanInitiative() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-              className={`relative aspect-[1/1] sm:aspect-[4/5] lg:aspect-square bg-slate-950 rounded-3xl p-6 overflow-hidden border transition-all duration-300 shadow-2xl shadow-blue-950/20 touch-none ${
-                isDragging 
-                  ? 'border-blue-500/60 cursor-grabbing shadow-blue-500/10' 
-                  : 'border-slate-800 dark:border-white/10 hover:border-blue-500/30 dark:hover:border-blue-500/20 cursor-grab'
-              }`}
+              className="relative aspect-[1/1] sm:aspect-[4/5] lg:aspect-square bg-slate-950 rounded-3xl p-6 overflow-hidden border border-slate-800 dark:border-white/10 hover:border-blue-500/30 transition-all shadow-2xl shadow-blue-950/20 touch-none cursor-grab active:cursor-grabbing"
               onWheel={handleWheel}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                handleDragStart(e.clientX, e.clientY);
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={handlePointerUp}
+              onPointerLeave={() => {
+                handlePointerUp();
+                setHoveredIdx(null);
               }}
-              onMouseMove={(e) => {
-                e.preventDefault();
-                handleDragMove(e.clientX, e.clientY);
-              }}
-              onMouseUp={handleDragEnd}
-              onMouseLeave={handleDragEnd}
-              onTouchStart={(e) => {
-                if (e.touches[0]) {
-                  handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
-                }
-              }}
-              onTouchMove={(e) => {
-                if (e.touches[0]) {
-                  handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
-                }
-              }}
-              onTouchEnd={handleDragEnd}
             >
-              {/* Dynamic Matrix Rain backdrop */}
+              {/* Background ambient mesh */}
               <div className="absolute inset-0 bg-dots opacity-20 dark:opacity-40 pointer-events-none" />
               <div className="absolute inset-0 bg-grid opacity-10 dark:opacity-15 mask-fade-edges pointer-events-none" />
 
-              {/* Conic Radar sweep signal overlay */}
-              <div 
-                className="absolute inset-0 pointer-events-none opacity-5 dark:opacity-15"
-                style={{
-                  background: 'conic-gradient(from 180deg at 50% 52%, rgba(56,189,248,0.3) 0deg, transparent 140deg, transparent 360deg)',
-                  animation: 'spin-slow 24s linear infinite',
-                }}
-              />
-
-              {/* HUD Active Metrics Panel */}
+              {/* HUD Metrics Header */}
               <div className="absolute top-4 left-4 z-20 space-y-1 bg-black/80 backdrop-blur-md rounded-xl p-3.5 border border-white/10 text-[10px] font-mono text-slate-400 pointer-events-none select-none">
                 <div className="flex items-center gap-1.5 text-blue-400 font-semibold uppercase tracking-wider">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                   </span>
-                  Cyber Guard Active
+                  CyberGuard Active
                 </div>
                 <div className="flex justify-between gap-4 text-slate-400">
                   <span>Secured Links:</span>
                   <span className="text-emerald-400 font-semibold">15 ENCRYPTED</span>
                 </div>
                 <div className="flex justify-between gap-4 text-slate-400">
-                  <span>BGP Latency:</span>
+                  <span>Latency:</span>
                   <span className="text-cyan-400 font-semibold">0.1ms (ZERO)</span>
                 </div>
                 <div className="flex justify-between gap-4 text-slate-400">
-                  <span>Active Nodes:</span>
+                  <span>Active Endpoints:</span>
                   <span className="text-white font-semibold">10,870</span>
                 </div>
               </div>
@@ -552,15 +640,23 @@ export function AfricanInitiative() {
                 </button>
                 <div className="h-3 w-px bg-white/10" />
                 <button
-                  onClick={() => setZoom((z) => Math.max(0.75, z - 0.15))}
+                  onClick={() => {
+                    const nz = Math.max(0.75, stateRef.current.zoom - 0.15);
+                    stateRef.current.zoom = nz;
+                    setZoomDisplay(Math.round(nz * 100));
+                  }}
                   title="Zoom Out"
                   className="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
                 >
                   <ZoomOut className="w-3.5 h-3.5" />
                 </button>
-                <span className="px-1.5 text-[10px] text-cyan-400 font-bold">{Math.round(zoom * 100)}%</span>
+                <span className="px-1.5 text-[10px] text-cyan-400 font-bold">{zoomDisplay}%</span>
                 <button
-                  onClick={() => setZoom((z) => Math.min(1.85, z + 0.15))}
+                  onClick={() => {
+                    const nz = Math.min(1.85, stateRef.current.zoom + 0.15);
+                    stateRef.current.zoom = nz;
+                    setZoomDisplay(Math.round(nz * 100));
+                  }}
                   title="Zoom In"
                   className="p-1.5 rounded-lg hover:bg-white/10 text-slate-300 hover:text-white transition-colors"
                 >
@@ -574,7 +670,7 @@ export function AfricanInitiative() {
                 <span>DRAG & SCROLL TO ZOOM</span>
               </div>
 
-              {/* Interactive Hover Card */}
+              {/* Interactive Telemetry Hover Card */}
               <div className="absolute bottom-4 left-4 right-4 z-20 h-[70px]">
                 <AnimatePresence mode="wait">
                   {hoveredIdx !== null ? (
@@ -628,229 +724,8 @@ export function AfricanInitiative() {
                 </AnimatePresence>
               </div>
 
-              {/* Dynamic Vector SVG Canvas */}
-              <svg className="relative w-full h-full select-none" viewBox="0 0 100 110">
-                <defs>
-                  <linearGradient id="conn-gradient-high" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.45" />
-                    <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.95" />
-                    <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.45" />
-                  </linearGradient>
-
-                  <linearGradient id="conn-gradient-dim" x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0%" stopColor="#38bdf8" stopOpacity="0.06" />
-                    <stop offset="100%" stopColor="#1e293b" stopOpacity="0.02" />
-                  </linearGradient>
-                  
-                  <radialGradient id="sphere-gradient" cx="50%" cy="52%" r="35%">
-                    <stop offset="0%" stopColor="#051427" stopOpacity="0.85" />
-                    <stop offset="65%" stopColor="#01060f" stopOpacity="0.98" />
-                    <stop offset="100%" stopColor="#000205" stopOpacity="1" />
-                  </radialGradient>
-
-                  <radialGradient id="glow-edge" cx="50%" cy="52%" r="33%">
-                    <stop offset="82%" stopColor="#38bdf8" stopOpacity="0" />
-                    <stop offset="96%" stopColor="#38bdf8" stopOpacity="0.12" />
-                    <stop offset="100%" stopColor="#38bdf8" stopOpacity="0.5" />
-                  </radialGradient>
-                </defs>
-
-                {/* Sphere Body & Atmosphere Glow */}
-                <circle
-                  cx="50"
-                  cy="52"
-                  r={r3(34 * zoom)}
-                  fill="url(#sphere-gradient)"
-                  stroke="url(#glow-edge)"
-                  strokeWidth="0.8"
-                  className="filter drop-shadow-[0_0_15px_rgba(56,189,248,0.35)] transition-all duration-150"
-                />
-
-                {/* Behind Hemisphere Land Points */}
-                <g opacity="0.12">
-                  {projectedLandDots.filter(d => d.z < 0).map((dot) => (
-                    <circle
-                      key={dot.id}
-                      cx={dot.x}
-                      cy={dot.y}
-                      r={r3(0.22 * zoom)}
-                      fill="#38bdf8"
-                    />
-                  ))}
-                </g>
-
-                {/* Front Hemisphere Land Points Matrix */}
-                <g>
-                  {projectedLandDots.filter(d => d.z >= -8).map((dot) => {
-                    const normalizedZ = (dot.z + 8) / 42;
-                    const dotOpacity = r3(Math.max(0.08, normalizedZ * (dot.isAfrica ? 0.85 : 0.5)));
-                    const dotRadius = r3(Math.max(0.12, normalizedZ * (dot.isAfrica ? 0.38 : 0.28) * zoom));
-                    
-                    return (
-                      <circle
-                        key={dot.id}
-                        cx={dot.x}
-                        cy={dot.y}
-                        r={dotRadius}
-                        fill={dot.isAfrica ? '#22d3ee' : '#38bdf8'}
-                        opacity={dotOpacity}
-                      />
-                    );
-                  })}
-                </g>
-
-                {/* Front Hemisphere 3D Inter-Node Connection Arcs */}
-                <g>
-                  {projectedConnections.map((conn, idx) => {
-                    if (!conn.isFront) return null;
-
-                    const isAnyNodeHovered = hoveredIdx !== null;
-                    const isLineActive = !isAnyNodeHovered || conn.isHighlighted;
-                    
-                    return (
-                      <g key={`conn-${idx}`}>
-                        <path
-                          d={conn.d}
-                          fill="none"
-                          stroke={isLineActive ? 'url(#conn-gradient-high)' : 'url(#conn-gradient-dim)'}
-                          strokeWidth={isLineActive ? (conn.isHighlighted ? '0.45' : '0.22') : '0.06'}
-                          strokeDasharray={conn.isCore || conn.isHighlighted ? 'none' : '1.2 1.2'}
-                          opacity={isLineActive ? (conn.isHighlighted ? 0.95 : 0.45) : 0.08}
-                          className="pointer-events-none"
-                        />
-
-                        {isLineActive && (
-                          <motion.path
-                            d={conn.d}
-                            fill="none"
-                            stroke={conn.isHighlighted ? '#22d3ee' : '#38bdf8'}
-                            strokeWidth={conn.isHighlighted ? '0.75' : '0.5'}
-                            strokeDasharray="2.5 30"
-                            initial={{ strokeDashoffset: 100 }}
-                            animate={{ strokeDashoffset: 0 }}
-                            transition={{
-                              duration: conn.isHighlighted ? 1.4 : (conn.isCore ? 2.4 : 3.2),
-                              repeat: Infinity,
-                              ease: 'linear',
-                              delay: idx * 0.1,
-                            }}
-                            className="pointer-events-none"
-                          />
-                        )}
-                      </g>
-                    );
-                  })}
-                </g>
-
-                {/* Active Interactive Hub Nodes */}
-                <g>
-                  {projectedNodes.filter(n => n.projZ >= -10).map((node) => {
-                    const isHovered = hoveredIdx === node.originalIdx;
-                    const isAnyHovered = hoveredIdx !== null;
-                    
-                    const isDimmed = isAnyHovered && !isHovered && !connections.some(([a, b]) => {
-                      const connMatches = (a === node.originalIdx || b === node.originalIdx);
-                      return connMatches && (a === hoveredIdx || b === hoveredIdx);
-                    });
-
-                    const depthFactor = (node.projZ + 10) / 44;
-                    if (depthFactor < 0.1) return null;
-
-                    return (
-                      <g
-                        key={`front-node-${node.name}`}
-                        className="cursor-pointer group/node"
-                        onMouseEnter={() => setHoveredIdx(node.originalIdx)}
-                        onMouseLeave={() => setHoveredIdx(null)}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          flyToNode(node.lat, node.lon);
-                        }}
-                        opacity={isDimmed ? 0.2 : depthFactor}
-                      >
-                        {/* Pulse ripple rings for master hubs */}
-                        {node.hub && !isDimmed && (
-                          <>
-                            <motion.circle
-                              cx={node.projX}
-                              cy={node.projY}
-                              r={r3(1.2 * zoom)}
-                              fill="none"
-                              stroke={isHovered ? '#22d3ee' : 'rgba(56, 189, 248, 0.45)'}
-                              strokeWidth="0.2"
-                              initial={{ scale: 0.8, opacity: 1 }}
-                              animate={{ scale: isHovered ? 4.8 : 3.2, opacity: 0 }}
-                              transition={{
-                                duration: 2.2,
-                                repeat: Infinity,
-                                ease: 'easeOut',
-                                delay: node.originalIdx * 0.2,
-                              }}
-                            />
-                          </>
-                        )}
-
-                        {/* Interactive glow backing */}
-                        <circle
-                          cx={node.projX}
-                          cy={node.projY}
-                          r={r3((node.hub ? 2.6 : 1.8) * zoom)}
-                          fill="rgba(34, 211, 238, 0.15)"
-                          stroke="rgba(34, 211, 238, 0.25)"
-                          strokeWidth="0.18"
-                          className={`transition-all duration-200 ${
-                            isHovered ? 'scale-125 opacity-100' : 'opacity-0'
-                          }`}
-                        />
-
-                        {/* Main center terminal marker */}
-                        <circle
-                          cx={node.projX}
-                          cy={node.projY}
-                          r={r3((node.hub ? 0.95 : 0.6) * zoom)}
-                          fill={isHovered ? '#22d3ee' : (node.hub ? '#38bdf8' : '#3b82f6')}
-                          stroke="#ffffff"
-                          strokeWidth="0.22"
-                          className="transition-all duration-200"
-                        />
-
-                        {/* Text label */}
-                        <text
-                          x={r3(node.projX + (node.projX > 50 ? -2.2 : 2.2))}
-                          y={r3(node.projY + 0.4)}
-                          fontSize={r3(1.3 * Math.max(0.85, zoom * 0.9))}
-                          fontFamily="monospace"
-                          fontWeight={node.hub ? 'bold' : 'normal'}
-                          textAnchor={node.projX > 50 ? 'end' : 'start'}
-                          stroke="#010409"
-                          strokeWidth="0.28"
-                          paintOrder="stroke"
-                          className={`transition-colors duration-200 fill-current select-none pointer-events-none ${
-                            isHovered 
-                              ? 'fill-cyan-400 font-bold' 
-                              : node.hub 
-                                ? 'fill-white font-bold' 
-                                : 'fill-slate-400'
-                          }`}
-                        >
-                          {node.name.replace(' Hub', '').replace(' Link', '').replace(' Node', '')}
-                        </text>
-                      </g>
-                    );
-                  })}
-                </g>
-
-                {/* Equator Ring */}
-                <circle
-                  cx="50"
-                  cy="52"
-                  r={r3(34 * zoom)}
-                  fill="none"
-                  stroke="rgba(56, 189, 248, 0.08)"
-                  strokeWidth="0.2"
-                  strokeDasharray="2 3"
-                />
-              </svg>
+              {/* High Performance HTML5 2D Canvas */}
+              <canvas ref={canvasRef} className="w-full h-full block" />
             </motion.div>
 
             {/* Hub Selector Fly-To Terminal Bar */}

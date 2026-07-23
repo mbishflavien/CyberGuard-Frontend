@@ -162,57 +162,60 @@ export function PlatformArchitecture() {
                   key={active}
                   initial={{ 
                     opacity: 0, 
-                    scale: 0.95,
-                    x: direction * 40,
+                    scale: 0.92,
+                    y: 20,
+                    x: direction * 50,
                   }}
                   animate={{ 
                     opacity: 1, 
                     scale: 1,
+                    y: 0,
                     x: 0,
                   }}
                   exit={{ 
                     opacity: 0, 
-                    scale: 0.95,
-                    x: -direction * 40,
+                    scale: 0.94,
+                    y: -10,
+                    x: -direction * 50,
                   }}
-                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                  className="w-full h-full glass-strong rounded-[32px] p-8 sm:p-10 flex flex-col justify-between border border-blue-500/20 shadow-[0_25px_60px_-15px_rgba(59,130,246,0.15)] bg-slate-950/80 backdrop-blur-xl relative overflow-hidden"
+                  transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
+                  className="w-full h-full rounded-[32px] p-8 sm:p-10 flex flex-col justify-between border border-blue-500/30 shadow-[0_25px_60px_-15px_rgba(59,130,246,0.22)] bg-slate-950/95 backdrop-blur-2xl relative overflow-hidden"
                 >
                   {/* Decorative faint glow */}
-                  <div className="absolute -top-12 -right-12 w-40 h-40 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+                  <div className="absolute -top-12 -right-12 w-48 h-48 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
                   
                   <div>
                     {/* Card Header */}
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-4">
-                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500/20 to-indigo-500/20 border border-blue-500/30 flex items-center justify-center">
                           {(() => {
                             const Icon = layers[active].icon;
                             return <Icon className="w-7 h-7 text-blue-400" />;
                           })()}
                         </div>
                         <div>
-                          <span className="text-[10px] font-mono uppercase tracking-widest text-blue-400 font-bold">Layer {active + 1} of {layers.length}</span>
-                          <h3 className="font-display text-xl sm:text-2xl font-bold text-white tracking-tight leading-none mt-0.5">
+                          <span className="text-[11px] font-mono uppercase tracking-widest text-sky-400 font-bold">Layer {active + 1} of {layers.length}</span>
+                          <h3 className="font-display text-2xl sm:text-3xl font-bold text-white tracking-tight leading-none mt-1">
                             {layers[active].name}
                           </h3>
                         </div>
                       </div>
                       
-                      <div className="flex items-center gap-1 bg-blue-500/10 px-2.5 py-1 rounded-full border border-blue-500/20 text-[10px] font-mono text-blue-300">
-                        <Shield className="w-3 h-3 text-blue-400" />
+                      <div className="flex items-center gap-1.5 bg-blue-500/15 px-3 py-1 rounded-full border border-blue-500/30 text-[10px] font-mono font-bold text-sky-300">
+                        <Shield className="w-3.5 h-3.5 text-sky-400" />
                         SECURED
                       </div>
                     </div>
 
                     {/* Description */}
-                    <p className="text-muted-foreground text-sm sm:text-base leading-relaxed mb-6">
+                    <p className="text-slate-100 dark:text-slate-100 text-sm sm:text-base leading-relaxed mb-6 font-normal">
                       {layers[active].description}
                     </p>
 
                     {/* Specs Section */}
-                    <div className="bg-white/5 border border-white/5 rounded-2xl p-4 sm:p-5 mb-6">
-                      <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    <div className="bg-slate-900/90 border border-slate-700/60 dark:border-white/10 rounded-2xl p-4 sm:p-5 mb-6 shadow-inner">
+                      <p className="text-xs sm:text-sm text-slate-200 dark:text-slate-200 leading-relaxed font-medium">
                         {layers[active].detail}
                       </p>
                     </div>
@@ -220,7 +223,7 @@ export function PlatformArchitecture() {
                     {/* Mini Spec Checklist */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {layers[active].metrics.slice(0, 2).map((metric, mi) => (
-                        <div key={mi} className="flex items-center gap-2 text-xs text-white/80 font-medium">
+                        <div key={mi} className="flex items-center gap-2 text-xs text-slate-100 font-semibold">
                           <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                           <span>{metric}</span>
                         </div>
@@ -229,10 +232,10 @@ export function PlatformArchitecture() {
                   </div>
 
                   {/* Manual Controls inside the focused frame */}
-                  <div className="flex items-center justify-between pt-6 border-t border-white/5 mt-auto">
+                  <div className="flex items-center justify-between pt-6 border-t border-white/10 mt-auto">
                     <button 
                       onClick={handlePrev}
-                      className="p-2 rounded-xl glass hover:bg-white/10 text-white/70 hover:text-white transition-all border border-white/5"
+                      className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white transition-all border border-white/10 hover:border-blue-500/40"
                       aria-label="Previous layer"
                     >
                       <ChevronLeft className="w-5 h-5" />
@@ -244,8 +247,8 @@ export function PlatformArchitecture() {
                         <button
                           key={i}
                           onClick={() => handleSelect(i)}
-                          className={`h-2.5 rounded-full transition-all duration-300 ${
-                            i === active ? 'w-8 bg-blue-400' : 'w-2.5 bg-white/15 hover:bg-white/30'
+                          className={`h-2.5 rounded-full transition-all duration-500 ${
+                            i === active ? 'w-8 bg-sky-400 shadow-[0_0_12px_rgba(56,189,248,0.6)]' : 'w-2.5 bg-white/20 hover:bg-white/40'
                           }`}
                           aria-label={`Go to layer ${i + 1}`}
                         />
@@ -254,7 +257,7 @@ export function PlatformArchitecture() {
 
                     <button 
                       onClick={handleNext}
-                      className="p-2 rounded-xl glass hover:bg-white/10 text-white/70 hover:text-white transition-all border border-white/5"
+                      className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white transition-all border border-white/10 hover:border-blue-500/40"
                       aria-label="Next layer"
                     >
                       <ChevronRight className="w-5 h-5" />
@@ -285,13 +288,6 @@ export function PlatformArchitecture() {
             </div>
 
           </div>
-
-          {/* Quick cycle status indicator under the cards */}
-          <div className="mt-6 flex items-center gap-2 text-xs text-muted-foreground font-mono bg-slate-950/45 border border-white/5 px-3.5 py-1.5 rounded-full">
-            <Activity className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
-            <span>Spontaneous sequence cycle: Active (4.5s)</span>
-          </div>
-
         </div>
       </div>
     </section>
