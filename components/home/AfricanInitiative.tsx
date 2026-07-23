@@ -259,8 +259,8 @@ export function AfricanInitiative() {
 
       // 1. Atmosphere Glow & Outer Ring
       const atmoGrad = ctx.createRadialGradient(centerX, centerY, R * 0.82, centerX, centerY, R * 1.15);
-      atmoGrad.addColorStop(0, 'rgba(56, 189, 248, 0.12)');
-      atmoGrad.addColorStop(0.7, 'rgba(14, 165, 233, 0.05)');
+      atmoGrad.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
+      atmoGrad.addColorStop(0.7, 'rgba(14, 165, 233, 0.03)');
       atmoGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
       ctx.fillStyle = atmoGrad;
       ctx.beginPath();
@@ -269,15 +269,15 @@ export function AfricanInitiative() {
 
       // 2. Globe Dark Sphere Backdrop
       const sphereGrad = ctx.createRadialGradient(centerX - R * 0.2, centerY - R * 0.2, R * 0.1, centerX, centerY, R);
-      sphereGrad.addColorStop(0, '#0a1d37');
-      sphereGrad.addColorStop(0.65, '#020914');
-      sphereGrad.addColorStop(1, '#01040a');
+      sphereGrad.addColorStop(0, '#0a172a');
+      sphereGrad.addColorStop(0.65, '#050c18');
+      sphereGrad.addColorStop(1, '#02060d');
       ctx.fillStyle = sphereGrad;
       ctx.beginPath();
       ctx.arc(centerX, centerY, R, 0, Math.PI * 2);
       ctx.fill();
 
-      ctx.strokeStyle = 'rgba(56, 189, 248, 0.4)';
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.25)';
       ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(centerX, centerY, R, 0, Math.PI * 2);
@@ -296,17 +296,17 @@ export function AfricanInitiative() {
 
         if (zFinal < 0) {
           // Back hemisphere dots
-          ctx.fillStyle = 'rgba(56, 189, 248, 0.1)';
+          ctx.fillStyle = 'rgba(148, 163, 184, 0.1)';
           ctx.beginPath();
           ctx.arc(px, py, 0.8 * state.zoom, 0, Math.PI * 2);
           ctx.fill();
         } else {
           // Front hemisphere dots
           const normZ = (zFinal + 1) / 2;
-          const alpha = Math.max(0.12, normZ * (pt.isAfrica ? 0.95 : 0.55));
-          const dotR = Math.max(0.9, normZ * (pt.isAfrica ? 1.8 : 1.3) * state.zoom);
+          const alpha = Math.max(0.12, normZ * (pt.isAfrica ? 0.95 : 0.5));
+          const dotR = Math.max(0.9, normZ * (pt.isAfrica ? 1.8 : 1.2) * state.zoom);
 
-          ctx.fillStyle = pt.isAfrica ? `rgba(34, 211, 238, ${alpha})` : `rgba(56, 189, 248, ${alpha * 0.7})`;
+          ctx.fillStyle = pt.isAfrica ? `rgba(56, 189, 248, ${alpha})` : `rgba(148, 163, 184, ${alpha * 0.6})`;
           ctx.beginPath();
           ctx.arc(px, py, dotR, 0, Math.PI * 2);
           ctx.fill();

@@ -8,28 +8,70 @@ interface CyberBackgroundVideoProps {
   canvasOpacity?: number; // range 0 to 1
 }
 
+// Highly reliable, public CDN video streams for ambient cyber background
+const VIDEO_SOURCES = [
+  'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
+  'https://cdn.coverr.co/videos/coverr-digital-network-lines-5374/1080p.mp4',
+  'https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-data-41539-large.mp4',
+];
+
 export function CyberBackgroundVideo({
   className = '',
-  videoOpacity = 0.55,
-  canvasOpacity = 0.12,
+  videoOpacity = 0.5,
+  canvasOpacity = 0.2,
 }: CyberBackgroundVideoProps) {
+  const [currentSourceIdx, setCurrentSourceIdx] = useState(0);
   const [videoLoaded, setVideoLoaded] = useState(false);
-  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  // Video Autoplay & Fallback source switching logic
   useEffect(() => {
-    // Attempt auto-play on mount
-    if (videoRef.current) {
-      videoRef.current.play().then(() => {
-        setVideoLoaded(true);
-      }).catch((err) => {
-        console.warn('HTML5 Auto-play prevented or loading:', err);
-        // Fallback: video will still show on canvas matrix or user interaction
-      });
-    }
+    const video = videoRef.current;
+    if (!video) return;
 
-    // 60fps Throttled High-Performance Matrix Rain Canvas
+    let isSubscribed = true;
+
+    const attemptPlay = async () => {
+      try {
+        video.muted = true;
+        video.playsInline = true;
+        await video.play();
+        if (isSubscribed) {
+          setVideoLoaded(true);
+        }
+      } catch (err) {
+        console.warn('Video playback autoplay attempt:', err);
+        // Try next source if current fails
+        if (isSubscribed && currentSourceIdx < VIDEO_SOURCES.length - 1) {
+          setCurrentSourceIdx((prev) => prev + 1);
+        }
+      }
+    };
+
+    attemptPlay();
+
+    // Re-trigger play on first user interaction if browser blocked strict autoplay
+    const handleUserInteraction = () => {
+      if (video.paused) {
+        video.play().then(() => setVideoLoaded(true)).catch(() => {});
+      }
+    };
+
+    window.addEventListener('touchstart', handleUserInteraction, { once: true });
+    window.addEventListener('click', handleUserInteraction, { once: true });
+    window.addEventListener('scroll', handleUserInteraction, { once: true });
+
+    return () => {
+      isSubscribed = false;
+      window.removeEventListener('touchstart', handleUserInteraction);
+      window.removeEventListener('click', handleUserInteraction);
+      window.removeEventListener('scroll', handleUserInteraction);
+    };
+  }, [currentSourceIdx]);
+
+  // High-performance 60fps Sovereign Cybernetic Canvas Generator (Runs alongside or as video fallback)
+  useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -37,16 +79,14 @@ export function CyberBackgroundVideo({
     if (!ctx) return;
 
     let animFrameId: number;
-    let lastTime = 0;
-    const targetFps = 30; // 30fps is optimal for matrix rain effect & saves CPU/GPU
-    const frameInterval = 1000 / targetFps;
+    let time = 0;
 
     const resizeCanvas = () => {
       if (!canvas || !canvas.parentElement) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const width = canvas.parentElement.clientWidth || window.innerWidth;
       const height = canvas.parentElement.clientHeight || window.innerHeight;
-      
+
       canvas.width = width * dpr;
       canvas.height = height * dpr;
       ctx.scale(dpr, dpr);
@@ -55,43 +95,83 @@ export function CyberBackgroundVideo({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    const chars = '01100110100101110010101010110011';
-    const charArr = chars.split('');
-    const fontSize = 14;
-    const columns = Math.floor((canvas.parentElement?.clientWidth || window.innerWidth) / fontSize) || 40;
-    const drops: number[] = Array(columns).fill(1).map(() => Math.floor(Math.random() * -50));
+    // Particle nodes for sovereign threat topology canvas
+    const nodeCount = 35;
+    const nodes = Array.from({ length: nodeCount }, () => ({
+      x: Math.random() * (canvas.parentElement?.clientWidth || 1200),
+      y: Math.random() * (canvas.parentElement?.clientHeight || 800),
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      radius: 1 + Math.random() * 2,
+    }));
 
-    const draw = (currentTime: number) => {
+    const draw = () => {
       animFrameId = requestAnimationFrame(draw);
-
-      const delta = currentTime - lastTime;
-      if (delta < frameInterval) return;
-      lastTime = currentTime - (delta % frameInterval);
+      time += 0.008;
 
       const width = canvas.parentElement?.clientWidth || window.innerWidth;
       const height = canvas.parentElement?.clientHeight || window.innerHeight;
 
-      const isDark = document.documentElement.classList.contains('dark');
-      ctx.fillStyle = isDark ? 'rgba(2, 6, 23, 0.15)' : 'rgba(248, 250, 252, 0.15)';
-      ctx.fillRect(0, 0, width, height);
+      ctx.clearRect(0, 0, width, height);
 
-      ctx.fillStyle = isDark ? 'rgba(56, 189, 248, 0.28)' : 'rgba(14, 165, 233, 0.18)';
-      ctx.font = `${fontSize}px monospace`;
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = charArr[Math.floor(Math.random() * charArr.length)];
-        const x = i * fontSize;
-        const y = drops[i] * fontSize;
-
-        if (y > 0) {
-          ctx.fillText(text, x, y);
-        }
-
-        if (y > height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-        drops[i]++;
+      // Render subtle slate titanium tactical grid lines
+      ctx.strokeStyle = 'rgba(148, 163, 184, 0.04)';
+      ctx.lineWidth = 1;
+      const step = 90;
+      for (let x = 0; x < width; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
       }
+      for (let y = 0; y < height; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+
+      // Draw moving sovereign data nodes
+      for (let i = 0; i < nodes.length; i++) {
+        const node = nodes[i];
+        node.x += node.vx;
+        node.y += node.vy;
+
+        if (node.x < 0 || node.x > width) node.vx *= -1;
+        if (node.y < 0 || node.y > height) node.vy *= -1;
+
+        ctx.fillStyle = 'rgba(59, 130, 246, 0.25)';
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Connect nearby nodes
+        for (let j = i + 1; j < nodes.length; j++) {
+          const nodeB = nodes[j];
+          const dx = node.x - nodeB.x;
+          const dy = node.y - nodeB.y;
+          const dist = Math.hypot(dx, dy);
+
+          if (dist < 180) {
+            const alpha = (1 - dist / 180) * 0.12;
+            ctx.strokeStyle = `rgba(99, 102, 241, ${alpha})`;
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.moveTo(node.x, node.y);
+            ctx.lineTo(nodeB.x, nodeB.y);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Wave pulse scanline
+      const scanY = (Math.sin(time * 0.5) * 0.5 + 0.5) * height;
+      const scanGrad = ctx.createLinearGradient(0, scanY - 30, 0, scanY + 30);
+      scanGrad.addColorStop(0, 'rgba(59, 130, 246, 0)');
+      scanGrad.addColorStop(0.5, 'rgba(59, 130, 246, 0.06)');
+      scanGrad.addColorStop(1, 'rgba(59, 130, 246, 0)');
+      ctx.fillStyle = scanGrad;
+      ctx.fillRect(0, scanY - 30, width, 60);
     };
 
     animFrameId = requestAnimationFrame(draw);
@@ -104,79 +184,41 @@ export function CyberBackgroundVideo({
 
   return (
     <div className={`absolute inset-0 z-0 overflow-hidden pointer-events-none select-none ${className}`}>
-      {/* 1. Dynamic localized Matrix Rain backdrop canvas - zero latency fallback */}
+      {/* 1. HTML5 Canvas Tactical Network Simulation (Zero-lag constant background stream) */}
       <canvas
         ref={canvasRef}
         style={{ opacity: canvasOpacity }}
         className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
       />
 
-      {/* 2. Direct HTML5 Background Video for seamless zero-stutter playback */}
-      {!videoError && (
-        <div
-          style={{ opacity: videoLoaded ? videoOpacity : 0 }}
-          className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
-        >
-          <video
-            ref={videoRef}
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            onLoadedData={() => setVideoLoaded(true)}
-            onError={() => setVideoError(true)}
-            className="absolute inset-0 w-full h-full object-cover filter saturate-125 contrast-110"
-          >
-            {/* Reliable MP4 ambient cyber security video streams */}
-            <source
-              src="https://cdn.coverr.co/videos/coverr-digital-network-lines-5374/1080p.mp4"
-              type="video/mp4"
-            />
-            <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-digital-animation-of-screens-with-data-41539-large.mp4"
-              type="video/mp4"
-            />
-          </video>
-        </div>
-      )}
-
-      {/* 3. YouTube Embed Backup if native video is hidden or loading */}
-      {videoError && (
-        <div
-          style={{ opacity: videoOpacity * 0.75 }}
-          className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
-        >
-          <iframe
-            src="https://www.youtube.com/embed/wyxxPTFfdi8?autoplay=1&mute=1&loop=1&playlist=wyxxPTFfdi8&controls=0&showinfo=0&modestbranding=1&rel=0&iv_load_policy=3&playsinline=1&disablekb=1&enablejsapi=1"
-            className="absolute top-1/2 left-1/2 w-[125%] h-[125%] md:w-[135%] md:h-[135%] -translate-x-1/2 -translate-y-1/2 pointer-events-none select-none"
-            allow="autoplay; encrypted-media; gyroscope; accelerometer; picture-in-picture"
-            title="Sovereign Cybersecurity Background Video"
-            frameBorder="0"
-            style={{ minWidth: '100%', minHeight: '100%' }}
-          />
-        </div>
-      )}
-
-      {/* 4. Holographic Grid & Tactical Scanlines Overlay */}
-      <div className="absolute inset-0 bg-grid opacity-[0.06] dark:opacity-[0.12] [mask-image:radial-gradient(ellipse_at_center,black_50%,transparent_90%)]" />
-      
-      {/* Moving tactical scanline */}
+      {/* 2. Direct HTML5 Background Video with auto-fallback sources */}
       <div
-        className="absolute inset-0 w-full h-full bg-[linear-gradient(to_bottom,rgba(56,189,248,0)_95%,rgba(56,189,248,0.06)_98%,rgba(56,189,248,0)_100%)] bg-[length:100%_400px] animate-pulse"
-        style={{ animationDuration: '6s' }}
-      />
+        style={{ opacity: videoLoaded ? videoOpacity : 0.2 }}
+        className="absolute inset-0 w-full h-full transition-opacity duration-1000 ease-in-out"
+      >
+        <video
+          ref={videoRef}
+          key={VIDEO_SOURCES[currentSourceIdx]}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          onLoadedData={() => setVideoLoaded(true)}
+          onError={() => {
+            if (currentSourceIdx < VIDEO_SOURCES.length - 1) {
+              setCurrentSourceIdx((prev) => prev + 1);
+            }
+          }}
+          className="absolute inset-0 w-full h-full object-cover filter contrast-125 saturate-90 brightness-90"
+        >
+          <source src={VIDEO_SOURCES[currentSourceIdx]} type="video/mp4" />
+        </video>
+      </div>
 
-      {/* Dynamic ambient halo circles */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full border border-sky-500/[0.04] dark:border-sky-500/[0.07] animate-pulse" />
-      <div
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1100px] h-[1100px] rounded-full border border-dashed border-blue-400/[0.03] dark:border-blue-400/[0.05] animate-spin"
-        style={{ animationDuration: '100s' }}
-      />
-
-      {/* 5. Deep-glow modern overlay that blends video seamlessly into theme */}
-      <div className="absolute inset-0 bg-slate-50/30 dark:bg-slate-950/40 transition-colors duration-500" />
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-50/15 via-transparent to-slate-50 dark:from-slate-950/20 dark:via-transparent dark:to-slate-950" />
+      {/* 3. Deep Sovereign Color Mask - Removes harsh neon blue, replacing with rich obsidian charcoal & slate */}
+      <div className="absolute inset-0 bg-slate-950/60 transition-colors duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-slate-950/20 to-slate-950" />
     </div>
   );
 }
